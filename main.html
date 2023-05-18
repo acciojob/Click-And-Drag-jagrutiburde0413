@@ -36,58 +36,49 @@
 
 
 <!-- //Your code goes here  -->
-	<script>
-    var itemsContainer = document.querySelector('.items');
-    var isDragging = false;
-    var startPosition = 0;
-    var currentTranslate = 0;
-    var prevTranslate = 0;
+	    <script>
+        var dragItem = null;
+        var startX, startY, offsetX, offsetY;
 
-    itemsContainer.addEventListener('mousedown', dragStart);
-    itemsContainer.addEventListener('mousemove', drag);
-    itemsContainer.addEventListener('mouseup', dragEnd);
-    itemsContainer.addEventListener('mouseleave', dragEnd);
+        // Function to handle the start of the drag
+        function dragStart(e) {
+            dragItem = this;
+            startX = e.clientX;
+            startY = e.clientY;
+            offsetX = 0;
+            offsetY = 0;
+            dragItem.classList.add('active');
+        }
 
-    itemsContainer.addEventListener('touchstart', dragStart);
-    itemsContainer.addEventListener('touchmove', drag);
-    itemsContainer.addEventListener('touchend', dragEnd);
-    itemsContainer.addEventListener('touchcancel', dragEnd);
+        // Function to handle the drag movement
+        function drag(e) {
+            if (dragItem) {
+                e.preventDefault();
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+                startX = e.clientX;
+                startY = e.clientY;
+                dragItem.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            }
+        }
 
-    function dragStart(event) {
-      if (event.type === 'touchstart') {
-        startPosition = event.touches[0].clientX;
-      } else {
-        startPosition = event.clientX;
-      }
+        // Function to handle the end of the drag
+        function dragEnd(e) {
+            if (dragItem) {
+                dragItem.style.transform = `translate(0, 0)`;
+                dragItem.classList.remove('active');
+                dragItem = null;
+            }
+        }
 
-      isDragging = true;
-      itemsContainer.classList.add('active');
-    }
-
-    function drag(event) {
-      if (!isDragging) return;
-
-      event.preventDefault();
-
-      var currentPosition = 0;
-      if (event.type === 'touchmove') {
-        currentPosition = event.touches[0].clientX;
-      } else {
-        currentPosition = event.clientX;
-      }
-
-      var diffPosition = currentPosition - startPosition;
-      currentTranslate = prevTranslate + diffPosition;
-
-      itemsContainer.style.transform = `translateX(${currentTranslate}px)`;
-    }
-
-    function dragEnd() {
-      isDragging = false;
-      itemsContainer.classList.remove('active');
-      prevTranslate = currentTranslate;
-    }
-</script>
+        // Attach event listeners to each item
+        var items = document.getElementsByClassName('item');
+        for (var i = 0; i < items.length; i++) {
+            items[i].addEventListener('mousedown', dragStart);
+            items[i].addEventListener('mousemove', drag);
+            items[i].addEventListener('mouseup', dragEnd);
+        }
+    </script>
 
   </body>
 </html>
